@@ -209,9 +209,12 @@ def final_output():
         horiz(springs),
         horiz(locks[:3]),
         horiz(locks[3:]),
-        replace(PIL.Image.open("template.png").crop((0,182,637,389)).convert("RGBA"), MAGENTA, CLEAR),
+        replace(PIL.Image.open("extract/template.png").crop((0,182,637,389)).convert("RGBA"), MAGENTA, CLEAR),
+        replace(PIL.Image.open("extract/template.png").crop((16,24,235,31)).convert("RGBA"), MAGENTA, CLEAR),
     ])
-    im2.save("spritesheet.png")
+    s=im2.size
+    im3 = im2.resize((s[0]//2, s[1]//2), PIL.Image.NEAREST)
+    im3.save("spritesheet.png")
 
 def extract_all(dir, limit=9999999):
     for filename in os.listdir(dir):
