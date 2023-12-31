@@ -31,6 +31,8 @@ BLUE = (0, 0, 170, 255)
 LIGHTBLUE = (85, 85, 255, 255)
 LIGHTGREY = (170, 170, 170, 255)
 CLEAR = (0, 0, 0, 0)
+def rescale(im):
+    return im.resize((im.size[0]//2, im.size[1]//2), PIL.Image.NEAREST)
 def replace(im, old, new):
     pixdata = im.load()
     for y in range(im.size[1]):
@@ -185,7 +187,7 @@ def open_type1(part, h):
     i = PIL.Image.open("image/{}/{}_{}.png".format(part, part, h))
     if blank:
         PIL.ImageDraw.Draw(i).rectangle(((0, 0), i.size), fill=CLEAR)
-    return i
+    return rescale(i)
     
 def open_type(part, hashes):
     return [open_type1(part, h) for h in hashes]
@@ -209,12 +211,10 @@ def final_output():
         horiz(springs),
         horiz(locks[:3]),
         horiz(locks[3:]),
-        replace(PIL.Image.open("extract/template.png").crop((0,182,637,389)).convert("RGBA"), MAGENTA, CLEAR),
-        replace(PIL.Image.open("extract/template.png").crop((16,24,235,31)).convert("RGBA"), MAGENTA, CLEAR),
+        rescale(replace(PIL.Image.open("extract/template.png").crop((0,182,638,390)).convert("RGBA"), MAGENTA, CLEAR)),
+        rescale(replace(PIL.Image.open("extract/template.png").crop((16,24,236,32)).convert("RGBA"), MAGENTA, CLEAR)),
     ])
-    s=im2.size
-    im3 = im2.resize((s[0]//2, s[1]//2), PIL.Image.NEAREST)
-    im3.save("spritesheet.png")
+    im2.save("spritesheet.png")
 
 def extract_all(dir, limit=9999999):
     for filename in os.listdir(dir):
