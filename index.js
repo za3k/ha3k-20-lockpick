@@ -171,18 +171,50 @@ class Game {
     async tryPick(pick) {
         const ti = this.tumblersUnlocked
         const tv = this.lock[ti]
-        // TODO: Animate
+        const x = 176 + ti*14
+        const ctx = this.ctx
+
         // TODO: Stuck tumblers
         // red: This tumbler seems to be jammed!
+
+        async function animateFail() {
+            SPRITES["tumbler_background_1"].draw(ctx, { x: x, y: 8 })
+            SPRITES[`pick_right_${pick}`].draw(ctx, { x: x, y: 30 })
+            SPRITES[`lock_unpicked_${tv}`].draw(ctx, { x: x, y: 41 })
+            await this.sleep(0.1)
+            SPRITES["tumbler_background_2"].draw(ctx, { x: x, y: 8 })
+            SPRITES[`lock_unpicked_${tv}`].draw(ctx, { x: x, y: 37 })
+            await this.sleep(0.1)
+            SPRITES["tumbler_background_3"].draw(ctx, { x: x, y: 8 })
+            SPRITES[`lock_unpicked_${tv}`].draw(ctx, { x: x, y: 33 })
+            await this.sleep(0.1)
+        }
+        async function animateSuccess() {
+            SPRITES["tumbler_background_3"].draw(ctx, { x: x, y: 8 })
+            SPRITES[`lock_picked_${tv}`].draw(ctx, { x: x, y: 28 })
+            await this.sleep(.1)
+            SPRITES["tumbler_background_2"].draw(ctx, { x: x, y: 8 })
+            SPRITES[`lock_picked_${tv}`].draw(ctx, { x: x, y: 32 })
+            await this.sleep(.05)
+            SPRITES["tumbler_background_1"].draw(ctx, { x: x, y: 8 })
+            SPRITES[`lock_picked_${tv}`].draw(ctx, { x: x, y: 36 })
+            await this.sleep(.05)
+        }
+        animateFail = animateFail.bind(this)
+        animateSuccess = animateSuccess.bind(this)
+
         if (pick == tv) { // Correct pick
             this.tumblersUnlocked++
             this.sound("tumbler_pick")
+            await animateSuccess()
         } else if (randBit()) {
             this.text = "red: Be careful! You'll break the pick!"
             this.sound("tumbler_warn")
+            await animateFail()
         } else {
             this.text = "red: Uh oh! You snapped that pick!"
             this.sound("tumbler_break")
+            await animateFail()
             return 1
         }
     }
@@ -228,7 +260,7 @@ class Game {
                 this.kbQueue.push(e.key)
                 break
             default:
-                console.log(`Unknown key: ${e.key}`)
+                //console.log(`Unknown key: ${e.key}`)
         }
     }
     _rectDraw(x, y, w, h, color) {
@@ -249,7 +281,6 @@ class Game {
         var line = ""
         for (var word of text.split(" ")) {
             if (line.length + word.length + 1 > 14) {
-                console.log(line.length, word.length, line, word)
                 lines.push(line)
                 line = ""
             }
